@@ -78,7 +78,9 @@ if CUSTOM_STATUS:
 async def discord_gateway() -> None:
     uri = "wss://gateway.discord.gg/?v=10&encoding=json"
 
-    async with websockets.connect(uri, ping_interval=None) as ws:
+    # Discord READY payloads for large accounts often exceed the library's
+    # default 1 MiB frame limit (~7–8 MiB observed), which closes the socket.
+    async with websockets.connect(uri, ping_interval=None, max_size=32 * 1024 * 1024) as ws:
         hello = json.loads(await ws.recv())
         heartbeat_interval = hello["d"]["heartbeat_interval"]
 
