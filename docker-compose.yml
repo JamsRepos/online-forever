@@ -1,0 +1,18 @@
+services:
+  online-forever:
+    build: .
+    image: ghcr.io/jamsrepos/online-forever:latest
+    container_name: online-forever
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TOKEN: ${TOKEN:?set TOKEN in your .env}
+      STATUS: ${STATUS:-online}
+      CUSTOM_STATUS: ${CUSTOM_STATUS:-Hey!}
+      USE_EMOJI: ${USE_EMOJI:-false}
+      EMOJI_NAME: ${EMOJI_NAME:-🔥}
+      EMOJI_ID: ${EMOJI_ID:-}
+      EMOJI_ANIMATED: ${EMOJI_ANIMATED:-false}
+      RECONNECT_DELAY: ${RECONNECT_DELAY:-5}
+      TZ: ${TZ:-Europe/London}
