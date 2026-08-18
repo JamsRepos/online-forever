@@ -26,6 +26,8 @@ USE_EMOJI = env_bool("USE_EMOJI", False)
 EMOJI_NAME = env("EMOJI_NAME", "🔥")
 EMOJI_ID = env("EMOJI_ID") or None
 EMOJI_ANIMATED = env_bool("EMOJI_ANIMATED", False)
+# AFK tells Discord this desktop session is idle, so mobile still gets pushes.
+AFK = env_bool("AFK", True)
 RECONNECT_DELAY = int(env("RECONNECT_DELAY", "5"))
 
 if not TOKEN:
@@ -75,6 +77,15 @@ if CUSTOM_STATUS:
     activities.append(activity)
 
 
+def presence_payload() -> dict:
+    return {
+        "status": STATUS,
+        "afk": AFK,
+        "since": int(time.time() * 1000) if AFK else None,
+        "activities": activities,
+    }
+
+
 async def discord_gateway() -> None:
     uri = "wss://gateway.discord.gg/?v=10&encoding=json"
 
@@ -100,21 +111,23 @@ async def discord_gateway() -> None:
                     "$browser": "chrome",
                     "$device": "pc",
                 },
-                "presence": {
-                    "status": STATUS,
-                    "afk": False,
-                    "activities": activities,
-                },
+                "presence": presence_payload(),
             },
         }
         await ws.send(json.dumps(identify))
-        print(f"Presence set to '{STATUS}'.")
+        afk_note = "AFK, mobile push allowed" if AFK else "active session, mobile push may be held"
+        print(f"Presence set to '{STATUS}' ({afk_note}).")
+        if STATUS == "dnd":
+            print("STATUS is dnd: Discord suppresses notifications on all devices.")
 
         while True:
             try:
                 msg = await ws.recv()
                 data = json.loads(msg)
                 opcode = data.get("op")
+
+                if opcode == 0 and data.get("t") == "READY":
+                    await ws.send(json.dumps({"op": 3, "d": presence_payload()}))
 
                 if opcode == 9:
                     print("Invalid session, reconnecting...")

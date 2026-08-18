@@ -22,12 +22,21 @@ cp .env.example .env
 docker compose up -d
 ```
 
+## Mobile notifications
+
+Discord holds push notifications while a desktop session looks active. This image marks the session as AFK by default (`AFK=true`) so the account can stay green/idle and your phone still gets messages.
+
+Use `STATUS=online` or `idle`. **Do Not Disturb** mutes notifications on every device, including mobile.
+
+Set `AFK=false` only if you want the old behaviour (desktop session treated as in use).
+
 ## Environment variables
 
 | Variable | Default | Description |
 | --- | --- | --- |
 | `TOKEN` | *(required)* | Discord user token. `DISCORD_TOKEN` is also accepted. |
-| `STATUS` | `online` | `online`, `idle`, `dnd`, or `invisible`. |
+| `STATUS` | `online` | `online`, `idle`, `dnd`, or `invisible`. `dnd` mutes notifications everywhere. |
+| `AFK` | `true` | Mark the session idle so Discord still pushes messages to mobile. |
 | `CUSTOM_STATUS` | `Hey!` | Custom status text. Leave empty to disable. |
 | `USE_EMOJI` | `false` | Set `true` to attach an emoji to the custom status. |
 | `EMOJI_NAME` | `🔥` | Unicode emoji or custom emoji name. |

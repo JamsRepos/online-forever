@@ -9,6 +9,7 @@ services:
     environment:
       TOKEN: ${TOKEN:?set TOKEN in your .env}
       STATUS: ${STATUS:-online}
+      AFK: ${AFK:-true}
       CUSTOM_STATUS: ${CUSTOM_STATUS:-Hey!}
       USE_EMOJI: ${USE_EMOJI:-false}
       EMOJI_NAME: ${EMOJI_NAME:-🔥}
